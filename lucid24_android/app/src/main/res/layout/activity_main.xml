@@ -1,37 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:orientation="vertical" android:gravity="center"
-    android:padding="32dp" android:background="@color/background">
-    <ImageView android:id="@+id/ivLogo"
-        android:layout_width="120dp" android:layout_height="120dp"
-        android:src="@drawable/elephant" android:layout_marginBottom="24dp"
-        android:contentDescription="Lucid24 logo" />
-    <TextView android:id="@+id/tvStatus"
-        android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:text="Starting..." android:textSize="18sp"
-        android:textColor="@color/textPrimary" android:layout_marginBottom="8dp"/>
-    <TextView android:id="@+id/tvCountdown"
-        android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:textSize="14sp" android:textColor="@color/textSecondary"
-        android:layout_marginBottom="8dp"/>
-    <ScrollView android:layout_width="match_parent" android:layout_height="100dp"
-        android:layout_marginBottom="16dp">
-        <TextView android:id="@+id/tvInfo"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:textSize="12sp" android:textColor="@color/textSecondary"
-            android:gravity="center"/>
-    </ScrollView>
-    <ProgressBar android:id="@+id/progressBar"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:visibility="gone" android:max="100" android:layout_marginBottom="16dp"/>
-    <Button android:id="@+id/btnUpdate"
-        android:layout_width="200dp" android:layout_height="wrap_content"
-        android:text="Update Now" android:visibility="gone"
-        android:onClick="onUpdateClicked"/>
-    <Button android:id="@+id/btnOffline"
-        android:layout_width="200dp" android:layout_height="wrap_content"
-        android:text="Continue Offline" android:visibility="gone"
-        android:onClick="onOfflineClicked"/>
-</LinearLayout>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1A1A2E">
+
+    <LinearLayout
+        android:id="@+id/mainLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
+
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginTop="32dp"
+            android:src="@drawable/elephant"
+            android:contentDescription="Lucid24 logo"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lucid24"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="12dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Early Buddhism Encyclopedia (Offline)"
+            android:textSize="14sp"
+            android:textColor="#AAAAAA"
+            android:layout_marginBottom="24dp"/>
+
+        <TextView
+            android:id="@+id/tvStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Starting up..."
+            android:textSize="15sp"
+            android:textColor="#DDDDDD"
+            android:gravity="center"
+            android:layout_marginBottom="8dp"/>
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:max="100"
+            android:progress="0"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/tvInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="12sp"
+            android:textColor="#888888"
+            android:gravity="center"
+            android:layout_marginBottom="4dp"/>
+
+        <TextView
+            android:id="@+id/tvSize"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="11sp"
+            android:textColor="#666666"
+            android:gravity="center"
+            android:layout_marginBottom="24dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btnLaunch"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:text="🌐  Launch Website"
+                android:textSize="14sp"
+                android:backgroundTint="#1565C0"
+                android:textColor="#FFFFFF"/>
+
+            <Button
+                android:id="@+id/btnUpdate"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="📥  Check Updates"
+                android:textSize="14sp"
+                android:backgroundTint="#2E7D32"
+                android:textColor="#FFFFFF"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <WebView
+        android:id="@+id/webView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
+
+</FrameLayout>
