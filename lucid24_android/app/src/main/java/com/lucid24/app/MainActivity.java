@@ -61,6 +61,9 @@ public class MainActivity extends AppCompatActivity {
         ws.setAllowFileAccessFromFileURLs(true);
         ws.setAllowUniversalAccessFromFileURLs(true);
         ws.setAllowFileAccess(true);
+        ws.setSupportZoom(true);
+        ws.setBuiltInZoomControls(true);
+        ws.setDisplayZoomControls(false);
         webView.setWebViewClient(new WebViewClient());
 
         btnLaunch.setEnabled(false);
