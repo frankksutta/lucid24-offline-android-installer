@@ -73,8 +73,25 @@ public class MainActivity extends AppCompatActivity {
             launchWebsite();
         });
 
+        // Restore WebView state if activity was recreated (e.g. low-memory kill)
+        if (savedInstanceState != null && savedInstanceState.getBoolean("in_webview", false)) {
+            webView.restoreState(savedInstanceState);
+            mainLayout.setVisibility(View.GONE);
+            webView.setVisibility(View.VISIBLE);
+            return; // skip installer flow — we're already browsing
+        }
+
         updateSizeDisplay();
         autoCheck();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle out) {
+        super.onSaveInstanceState(out);
+        if (webView.getVisibility() == View.VISIBLE) {
+            webView.saveState(out);
+            out.putBoolean("in_webview", true);
+        }
     }
 
     // ── AUTO CHECK ───────────────────────────────────────────────────────────
