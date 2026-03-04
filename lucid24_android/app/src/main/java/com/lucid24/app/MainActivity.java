@@ -2,9 +2,7 @@ package com.lucid24.app;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.View;
@@ -22,14 +20,9 @@ import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
-    // ── Installer version — bump this before every APK upload ───────────────
-    static final String APP_VERSION = "1.0.1";
-
     // ── URLs (GitHub releases — direct download, no confirmation page) ──────
-    static final String INFO_URL           = "https://github.com/frankksutta/lucid24-offline-releases/releases/latest/download/lucid24-offline-latest-info.txt";
-    static final String UPDATE_URL         = "https://github.com/frankksutta/lucid24-offline-releases/releases/latest/download/lucid24-offline-latest.zip";
-    static final String INSTALLER_INFO_URL = "https://github.com/frankksutta/lucid24-offline-releases/releases/latest/download/lucid24-offline-android-installer-info.json";
-    static final String INSTALLER_DL_URL  = "https://github.com/frankksutta/lucid24-offline-releases/releases/latest/download/lucid24-offline-android-installer.apk";
+    static final String INFO_URL   = "https://github.com/frankksutta/lucid24-offline-releases/releases/latest/download/lucid24-offline-latest-info.txt";
+    static final String UPDATE_URL = "https://github.com/frankksutta/lucid24-offline-releases/releases/latest/download/lucid24-offline-latest.zip";
 
     static final int COUNTDOWN_UPTODATE = 5;
     static final int COUNTDOWN_OFFLINE  = 8;
@@ -37,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     static final String PREF_DATE       = "installed_date";
 
     // ── UI ───────────────────────────────────────────────────────────────────
-    TextView    tvStatus, tvInfo, tvSize, tvFooter;
+    TextView    tvStatus, tvInfo, tvSize;
     ProgressBar progressBar;
     Button      btnLaunch, btnUpdate;
     WebView     webView;
@@ -56,15 +49,11 @@ public class MainActivity extends AppCompatActivity {
         tvStatus    = findViewById(R.id.tvStatus);
         tvInfo      = findViewById(R.id.tvInfo);
         tvSize      = findViewById(R.id.tvSize);
-        tvFooter    = findViewById(R.id.tvFooter);
         progressBar = findViewById(R.id.progressBar);
         btnLaunch   = findViewById(R.id.btnLaunch);
         btnUpdate   = findViewById(R.id.btnUpdate);
         webView     = findViewById(R.id.webView);
         mainLayout  = findViewById(R.id.mainLayout);
-
-        // Show installer version + content date in footer
-        updateFooter();
 
         // Setup WebView
         WebSettings ws = webView.getSettings();
@@ -84,12 +73,12 @@ public class MainActivity extends AppCompatActivity {
             launchWebsite();
         });
 
-        // Restore WebView state if activity was recreated (e.g. low-memory kill)
+        // Restore WebView if activity was recreated
         if (savedInstanceState != null && savedInstanceState.getBoolean("in_webview", false)) {
             webView.restoreState(savedInstanceState);
             mainLayout.setVisibility(View.GONE);
             webView.setVisibility(View.VISIBLE);
-            return; // skip installer flow — we're already browsing
+            return;
         }
 
         updateSizeDisplay();
@@ -105,14 +94,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // ── FOOTER ───────────────────────────────────────────────────────────────
-
-    void updateFooter() {
-        String contentDate = getInstalledDate();
-        String content = contentDate.isEmpty() ? "not installed" : contentDate;
-        tvFooter.setText("Installer v" + APP_VERSION + "  |  Content: " + content);
-    }
-
     // ── AUTO CHECK ───────────────────────────────────────────────────────────
 
     void autoCheck() {
@@ -122,10 +103,7 @@ public class MainActivity extends AppCompatActivity {
             tvInfo.setText("Installed: " + getInstalledDate());
         }
         setStatus("Checking for updates\u2026");
-        new Thread(() -> {
-            checkForUpdates(true);
-            checkInstallerVersion();  // runs after content check, non-blocking
-        }).start();
+        new Thread(() -> checkForUpdates(true)).start();
     }
 
     void manualCheck() {
@@ -215,55 +193,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // ── INSTALLER VERSION CHECK ──────────────────────────────────────────────
-
-    void checkInstallerVersion() {
-        try {
-            HttpURLConnection conn = (HttpURLConnection) new URL(INSTALLER_INFO_URL).openConnection();
-            conn.setInstanceFollowRedirects(true);
-            conn.setConnectTimeout(10_000);
-            conn.setReadTimeout(10_000);
-            conn.setRequestProperty("User-Agent", "Mozilla/5.0");
-            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            StringBuilder sb = new StringBuilder(); String line;
-            while ((line = br.readLine()) != null) sb.append(line);
-            br.close();
-
-            JSONObject info    = new JSONObject(sb.toString());
-            String remoteVer   = info.optString("version", "");
-            String releaseNotes = info.optString("notes", "");
-
-            if (remoteVer.isEmpty() || remoteVer.equals(APP_VERSION)) return;
-
-            // Simple string comparison works for semver if you keep major/minor/patch zero-padded
-            // or just let any difference trigger the alert — owner controls both sides
-            String msg = "A new version of the Lucid24 Android Installer is available."
-                + "\n\nThis is the installer app itself — separate from the Lucid24 content."
-                + "\n\nInstalled installer:  v" + APP_VERSION
-                + "\nAvailable installer:  v" + remoteVer
-                + (releaseNotes.isEmpty() ? "" : "\n\nWhat\u2019s new: " + releaseNotes)
-                + "\n\nTap \u2018Download\u2019 to open the download page in your browser."
-                + " Install the APK file it downloads, then reopen the app.";
-
-            runOnUiThread(() ->
-                new AlertDialog.Builder(this)
-                    .setTitle("\uD83D\uDCF2 Installer Update Available")
-                    .setMessage(msg)
-                    .setPositiveButton("Download", (d, w) -> openDownloadPage())
-                    .setNegativeButton("Not Now", null)
-                    .show()
-            );
-
-        } catch (Exception e) {
-            // Silently ignore — installer update check is best-effort
-        }
-    }
-
-    void openDownloadPage() {
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(INSTALLER_DL_URL));
-        startActivity(intent);
-    }
-
     // ── DOWNLOAD & INSTALL ───────────────────────────────────────────────────
 
     void downloadAndInstall() {
@@ -344,7 +273,6 @@ public class MainActivity extends AppCompatActivity {
             tempZip.delete();
 
             saveInstalledDate(remoteDate);
-            updateFooter();
             setProgressBar(100);
             setStatus("\u2705 Installed! (" + remoteDate + ")");
             setInfo("Installed: " + remoteDate + "  |  " + count + " files extracted");
