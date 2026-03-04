@@ -23,7 +23,7 @@ import org.json.JSONObject;
 public class MainActivity extends AppCompatActivity {
 
     // ── Installer version — bump this before every APK upload ───────────────
-    static final String APP_VERSION = "1.0.0";
+    static final String APP_VERSION = "1.0.1";
 
     // ── URLs (GitHub releases — direct download, no confirmation page) ──────
     static final String INFO_URL           = "https://github.com/frankksutta/lucid24-offline-releases/releases/latest/download/lucid24-offline-latest-info.txt";
